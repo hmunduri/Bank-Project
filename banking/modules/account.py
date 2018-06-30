@@ -3,8 +3,9 @@ import sys,os
 os.system('cls' if os.name == 'nt' else 'clear')
 
 """
-
-test
+New enhancements
+prompt user for option to opt overdraft while account opening and also 
+deduct the overdraft charges from the user account
 """
 
 
