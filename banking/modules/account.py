@@ -2,10 +2,9 @@
 import sys,os
 os.system('cls' if os.name == 'nt' else 'clear')
 
+translist = [] #Used for the trasacation list
 """
-New enhancements
-prompt user for option to opt overdraft while account opening and also 
-deduct the overdraft charges from the user account
+View Trascations and last transacation has been added.
 """
 
 
@@ -14,6 +13,7 @@ class Account:
         print("Welcome to BOFA")
         self.accnt_balance = 0
         self.option_six = ["6",  "Q", "q",  "quit", "Quit"]
+        self.overdraft_yes = ["y",  "Yes", "YES",  "YeS", "Y", "YEs", "yeS"]
         self.show_menu_and_process_request()
 
     def show_menu_and_process_request(self):
@@ -25,6 +25,8 @@ class Account:
             4.View Balance
             5.Request Loan
             6.Quit (q)
+            7.View Trasactions
+            8.Last Recent trasaction
 
             Please enter your choice: ''')
             if choice == "1":
@@ -32,6 +34,7 @@ class Account:
                 overdraft   = input("Would you like to enable overdraft on your account(Yes or No):")
                 if new_account >= 150:
                     self.accnt_balance = new_account
+                    translist.append("Your First account open Balance: {}".format(self.accnt_balance))
                     self.open_account()
                 else:
                     print("Minimum Balance ($150) required to open an account,  Your application cannot be processed")
@@ -43,13 +46,17 @@ class Account:
                 if self.accnt_balance >= money:
                     self.withdraw_money(money)
                 else:
-                    print("Your will be charged overdraft chages")
-                    if overdraft == "Yes":
-                        self.accnt_balance -= 12
-                        self.withdraw_money(money)
+                    if self.accnt_balance <= 0:
+                        print("Your Account is already overdrafted or the Balance is '0', Please contact the Bank")
                     else:
-                        self.accnt_balance -= 50
-                        self.withdraw_money(money)
+                        if overdraft in self.overdraft_yes:
+                            print("You will be charged $12 overdraft penality")
+                            self.accnt_balance -= 12
+                            self.withdraw_money(money)
+                        else:
+                            print("You will be charged overdraft penality")
+                            self.accnt_balance -= 50
+                            self.withdraw_money(money)
             elif choice == "4":
                 self.view_balance()
             elif choice == "5":
@@ -59,24 +66,33 @@ class Account:
                     print("No sufficient funds,  we cannot process your application for Loan")
             elif choice in self.option_six:
                 break
+            elif choice == "7":
+                print("**** Your Account transcations ****")
+                for list in translist:
+                    print(list)
+            elif choice == "8":
+                print("**** Your Last Recent Trascation *** ")
+                print(translist[-1])
+                
             else:
                 print("Sorry, You have made a wrong choice")
             
-
 
     def open_account(self):
         print("your account opened with new balance: {}".format(self.accnt_balance))
 
     def deposit_money(self, money):
         self.accnt_balance += money
-        print("successfully deposited moeny")
+        translist.append("Deposit trasaction: {}".format(self.accnt_balance))
+        print("successfully deposited money")
 
     def withdraw_money(self, money):
         self.accnt_balance -= money
+        translist.append("withdraw trasaction: {}".format(self.accnt_balance))
         print("successfully money withdrawn")
 
     def view_balance(self):
-        print("your accoutn balance is : {}".format(self.accnt_balance))
+        print("your account balance is : {}".format(self.accnt_balance))
     
 
 krishnas_acnt = Account()
