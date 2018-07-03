@@ -12,7 +12,7 @@ class Account:
     def __init__(self):
         print("Welcome to BOFA")
         self.accnt_balance = 0
-        self.date = datetime.date.today()
+        self.now = datetime.datetime.now()
         self.option_six = ["6",  "Q", "q",  "quit", "Quit"]
         self.overdraft_yes = ["y",  "Yes", "YES",  "YeS", "Y", "YEs", "yeS"]
         self.show_menu_and_process_request()
@@ -36,7 +36,7 @@ class Account:
                 overdraft   = input("Would you like to enable overdraft on your account(Yes or No):")
                 if new_account >= 150:
                     self.accnt_balance = new_account
-                    translist.append("{0}\tYour First account open Balance: {1}".format((self.date), (self.accnt_balance)))
+                    translist.append("Your First account open Balance: {}".format(self.accnt_balance))
                     self.open_account()
                 else:
                     print("Minimum Balance ($150) required to open an account,  Your application cannot be processed")
@@ -90,12 +90,12 @@ class Account:
 
     def deposit_money(self, money):
         self.accnt_balance += money
-        translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+        translist.append("Deposit trasaction : {}".format(self.accnt_balance))
         print("successfully deposited money")
 
     def withdraw_money(self, money):
         self.accnt_balance -= money
-        translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+        translist.append(" {0} Withdraw trasaction {1}".format((self.now), (self.accnt_balance)))
         print("successfully money withdrawn")
 
     def view_balance(self):
