@@ -2,7 +2,6 @@
 import sys,os,datetime,time
 os.system('cls' if os.name == 'nt' else 'clear')
 
-translist = [] #Used for the trasacation list
 """
 View Trascations and last transacation has been added.
 """
@@ -12,9 +11,10 @@ class Account:
     def __init__(self):
         print("Welcome to BOFA")
         self.accnt_balance = 0
+        self.translist = []
         self.date = datetime.date.today()
         self.option_six = ["6",  "Q", "q",  "quit", "Quit"]
-        self.overdraft_yes = ["y",  "Yes", "YES",  "YeS", "Y", "YEs", "yeS"]
+        self.overdraft_yes = ["y",  "yes"]
         self.show_menu_and_process_request()
 
     def show_menu_and_process_request(self):
@@ -33,10 +33,10 @@ class Account:
             if choice == "1":
                 self.screen_clear()
                 new_account = int(input("Please enter the minimum balance 150 to open your account :"))
-                overdraft   = input("Would you like to enable overdraft on your account(Yes or No):")
+                overdraft   = input("Do you like to enable overdraft on your account(Yes or No):").lower()
                 if new_account >= 150:
                     self.accnt_balance = new_account
-                    translist.append("{0}\tYour First account open Balance: {1}".format((self.date), (self.accnt_balance)))
+                    self.translist.append("{0}\tYour First account open Balance : {1}".format((self.date), (self.accnt_balance)))
                     self.open_account()
                 else:
                     print("Minimum Balance ($150) required to open an account,  Your application cannot be processed")
@@ -74,28 +74,29 @@ class Account:
                 break
             elif choice == "7":
                 self.screen_clear()
-                print("**** Your Account transcations ****")
-                for list in translist:
+                print("Date\t\tTrasaction Type\t\t\t Balance Available")
+                print("==================================================================")
+                for list in self.translist:
                     print(list)
             elif choice == "8":
                 self.screen_clear()
                 print("**** Your Last Recent Trascation *** ")
-                print(translist[-1])
+                print(self.translist[-1])
             else:
                 print("Sorry, You have made a wrong choice")
             
 
     def open_account(self):
-        print("your account opened with new balance: {}".format(self.accnt_balance))
+        print("your account opened with new balance  : {}".format(self.accnt_balance))
 
     def deposit_money(self, money):
         self.accnt_balance += money
-        translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+        self.translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
         print("successfully deposited money")
 
     def withdraw_money(self, money):
         self.accnt_balance -= money
-        translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+        self.translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
         print("successfully money withdrawn")
 
     def view_balance(self):
