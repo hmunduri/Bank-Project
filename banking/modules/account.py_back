@@ -119,11 +119,10 @@ class Account:
     def screen_clear(self):
         os.system('clear')
     def customer_details(self):
-        self.customer_data.append[Firstname]  = input("Enter the customer Last name :").split()
-        Lastname  = input("Enter the customer Last name :").split()
-        Contact = input("Enter your contact :").split()
-        self.customer_data.append
+        self.customer_data[Firstname] = input("Enter the customer First name :").split()
+        self.customer_data[Lastname]  = input("Enter the customer Last name :").split()
+        self.customer_data[Contact_number] = input("Enter your contact :").split()
         self.account_number = randint(0,10000)
-        self.customer_data[self.account_number] = {Firstname,Lastname,Contact}
+        self.customer_data[self.account_number] = {Firstname, Lastname, Contact_number}
         print(self.customer_data)
 krishnas_acnt = Account()
