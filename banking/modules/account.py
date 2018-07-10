@@ -20,6 +20,7 @@ class Account:
         self.option_six = ["6",  "q", "quit"]
         self.overdraft_yes = ["y",  "yes"]
         self.show_menu_and_process_request()
+        self.overdraft_plan = False
 
     def show_menu_and_process_request(self):
         while True:
@@ -32,26 +33,30 @@ class Account:
             6.Quit (q)
             7.View Trasactions
             8.Last Recent trasaction
+            9.View customer details
 
             Please enter your choice: ''')
             if choice == "1":
                 self.open_account()
+                self.update_cust_data()
             elif choice == "2":
                 self.deposit_money()
+                self.update_cust_data()
             elif choice == "3":
                 self.withdraw_money()
+                self.update_cust_data()
             elif choice == "4":
                 self.view_balance()
             elif choice == "5":
                 self.loan_check()
-            elif choice in self.option_six:
+            elif choice.lower() in self.option_six:
                 break
             elif choice == "7":
                  self.transaction_list() 
             elif choice == "8":
                  self.last_transaction()
-            elif choice == "8":
-                 account_check()
+            elif choice == "9":
+                 self.customer_details()
             else:
                 self.screen_clear()
                 print("Sorry, You have made a wrong choice")
@@ -61,8 +66,10 @@ class Account:
         self.screen_clear()
         new_account = int(input("Please enter the minimum balance 150 to open your account :"))
         overdraft   = input("Do you like to enable overdraft on your account(Yes or No):").lower()
+        if overdraft in self.overdraft_yes:
+            self.overdraft_plan = True
         if new_account >= 150:
-            self.customer_details()
+            self.customer_entries()
             self.accnt_balance = new_account
             self.translist.append("{0}\tYour First account open Balance : {1}".format((self.date), (self.accnt_balance)))
             print("your account opened with new account number {0} and the balance is {1}".format((self.account_number), (self.accnt_balance)))
@@ -87,7 +94,7 @@ class Account:
             if self.accnt_balance <= 0:
                 print("Your Account is already overdrafted or the Balance is '0', Please contact the Bank")
             else:
-                if overdraft in self.overdraft_yes:
+                if self.overdraft_plan:
                     print("You will be charged $12 overdraft penality")
                     self.accnt_balance -= 12
                     self.withdraw_money(money)
@@ -95,35 +102,51 @@ class Account:
                     print("You will be charged overdraft penality")
                     self.accnt_balance -= 50
                     self.withdraw_money(money)
+
     def view_balance(self):
         self.screen_clear()
         print("your account balance is : {}".format(self.accnt_balance))
+
     def loan_check(self):
         self.screen_clear()
         if self.accnt_balance >= 500:
             print("We considered your Loan application and it will be processed")
         else:
             print("No sufficient funds,  we cannot process your application for Loan")
+
     def transaction_list(self):
         self.screen_clear()
         print("Date\t\tTrasaction Type\t\t\t Balance Available")
         print("==================================================================")
         for list in self.translist:
             print(list)
+
     def last_transaction(self):
         self.screen_clear()
         print("**** Your Last Recent Trascation *** ")
         print("Date\t\tTrasaction Type\t\t\t Balance Available")
         print("==================================================================")
         print(self.translist[-1])
+
     def screen_clear(self):
         os.system('clear')
-    def customer_details(self):
-        self.customer_data.append[Firstname]  = input("Enter the customer Last name :").split()
-        Lastname  = input("Enter the customer Last name :").split()
-        Contact = input("Enter your contact :").split()
-        self.customer_data.append
+
+    def customer_entries(self):
+        self.customer_data["Firstname"]  = input("Enter the customer First name :")
+        self.customer_data["Lastname"]   = input("Enter the customer Last name :")
+        self.customer_data["contact"]    = input("Enter your contact :")
+        self.customer_data["overdraft_plan"] = self.overdraft_plan
         self.account_number = randint(0,10000)
-        self.customer_data[self.account_number] = {Firstname,Lastname,Contact}
+        self.customer_data["account_number"] = self.account_number
+
+    def customer_details(self):
         print(self.customer_data)
+
+    def update_cust_data(self):
+        self.customer_data["balance"] = self.accnt_balance 
+
+
+
+       
+            
 krishnas_acnt = Account()
