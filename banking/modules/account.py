@@ -5,7 +5,7 @@ from random import randint
 os.system('cls' if os.name == 'nt' else 'clear')
 
 """
-View Trascations and last transacation has been added.
+Banking Project
 """
 
 
@@ -19,48 +19,69 @@ class Account:
         self.date = datetime.date.today()
         self.option_six = ["6",  "q", "quit"]
         self.overdraft_yes = ["y",  "yes"]
-        self.show_menu_and_process_request()
+        self.account_open = False
         self.overdraft_plan = False
+        self.file_location = "/Users/hima/Python/Bank-Project/banking/files/customer_data.txt"
+        self.show_menu_and_process_request()
 
     def show_menu_and_process_request(self):
         while True:
             choice = input( '''
             1.Open Account
-            2.Money Deposit
-            3.Money withdrawal
-            4.View Balance
-            5.Request Loan
-            6.Quit (q)
-            7.View Trasactions
-            8.Last Recent trasaction
-            9.View customer details
-
+            2.Login
+            
             Please enter your choice: ''')
             if choice == "1":
                 self.open_account()
-                self.update_cust_data()
             elif choice == "2":
-                self.deposit_money()
-                self.update_cust_data()
-            elif choice == "3":
-                self.withdraw_money()
-                self.update_cust_data()
-            elif choice == "4":
-                self.view_balance()
-            elif choice == "5":
-                self.loan_check()
-            elif choice.lower() in self.option_six:
-                break
-            elif choice == "7":
-                 self.transaction_list() 
-            elif choice == "8":
-                 self.last_transaction()
-            elif choice == "9":
-                 self.customer_details()
-            else:
-                self.screen_clear()
-                print("Sorry, You have made a wrong choice")
-            
+                account_number = input("Please enter your account number:")
+                self.validate_user_and_process_request(account_number)
+
+    
+    def customer_options(self):
+        choice = input('''
+        1.Change Profile            
+        2.Money Deposit
+        3.Money withdrawal
+        4.View Balance
+        5.Request Loan
+        6.Quit (q)
+        7.View Trasactions
+        8.Last Recent trasaction
+        9.View customer details
+
+        Please enter your choice: ''')
+
+        if choice == "1":
+            print("still working")
+        elif choice == "2":
+            self.deposit_money()
+            self.update_cust_data()
+        elif choice == "3":
+            self.withdraw_money()
+            self.update_cust_data()
+        elif choice == "4":
+            self.view_balance()
+        elif choice == "5":
+            self.loan_check()
+        elif choice.lower() in self.option_six:
+            break
+        elif choice == "7":
+            self.transaction_list()
+        elif choice == "8":
+            self.last_transaction()
+        elif choice == "9":
+            self.customer_details()
+        else:
+            self.screen_clear()
+            print("Sorry, You have made a wrong choice")
+    
+    def validate_user_and_process_request(self, account_num):
+        with open(self.file_location, 'r') as file:
+            for cust_record in file:
+                if account_num == cust_record['account_number']:
+                    self.customer_data = cust_record
+                    self.customer_options()   
 
     def open_account(self):
         self.screen_clear()
@@ -69,10 +90,11 @@ class Account:
         if overdraft in self.overdraft_yes:
             self.overdraft_plan = True
         if new_account >= 150:
-            self.customer_entries()
             self.accnt_balance = new_account
+            self.customer_entries()
             self.translist.append("{0}\tYour First account open Balance : {1}".format((self.date), (self.accnt_balance)))
             print("your account opened with new account number {0} and the balance is {1}".format((self.account_number), (self.accnt_balance)))
+            self.account_open = True
         else:
             print("Minimum Balance ($150) required to open an account,  Your application cannot be processed")
 
@@ -114,6 +136,13 @@ class Account:
         else:
             print("No sufficient funds,  we cannot process your application for Loan")
 
+    def account_open_check(self):
+        if self.account_open == True :
+           return
+        else:
+           print("Please open account first")
+           self.show_menu_and_process_request()
+           
     def transaction_list(self):
         self.screen_clear()
         print("Date\t\tTrasaction Type\t\t\t Balance Available")
@@ -134,19 +163,21 @@ class Account:
     def customer_entries(self):
         self.customer_data["Firstname"]  = input("Enter the customer First name :")
         self.customer_data["Lastname"]   = input("Enter the customer Last name :")
-        self.customer_data["contact"]    = input("Enter your contact :")
+        self.customer_data["contact_number"]    = input("Enter your contact :")
         self.customer_data["overdraft_plan"] = self.overdraft_plan
         self.account_number = randint(0,10000)
         self.customer_data["account_number"] = self.account_number
+        self.customer_data["opening_balance"] = self.accnt_balance
+        self.cust_data_write_to_file()
 
     def customer_details(self):
         print(self.customer_data)
 
     def update_cust_data(self):
-        self.customer_data["balance"] = self.accnt_balance 
-
-
-
-       
-            
+        self.customer_data["balance_avail"] = self.accnt_balance 
+        self.cust_data_write_to_file()
+    
+    def cust_data_write_to_file(self):     
+        with open(self.file_location, 'w+') as file:
+            file.write(str(self.customer_data) + "\n")
 krishnas_acnt = Account()
