@@ -64,7 +64,7 @@ class Account:
             9.View customer details
             Please enter your choice: ''')
             if choice == "1":
-                print("still working")
+                self.change_profile()
             elif choice == "2":
                 self.deposit_money()
                 self.update_cust_data()
@@ -98,6 +98,16 @@ class Account:
                     self.logger.log("is the  valid user: {}".format(self.is_valid_user)) 
                     break 
 
+    def change_profile(self):
+        print("At this moment, you can only update your contact details")
+        customer_new_contact = int(input("Please enter the new contact:"))
+        with open(self.file_location, 'w+') as file:
+            for cust_record in file:
+                cust_record = ast.literal_eval(cust_record)
+                cust_record["contact_number"] = customer_new_contact
+                self.logger.log("New customer details {} has been updated.".format(customer_new_contact))
+                file.write(cust_record)
+        
     def open_account(self):
         self.screen_clear()
         new_account = int(input("Please enter the minimum balance 150 to open your account :"))
@@ -109,6 +119,7 @@ class Account:
             self.customer_entries()
             self.translist.append("{0}\tYour First account open Balance : {1}".format((self.date), (self.accnt_balance)))
             print("your account opened with new account number {0} and the balance is {1}".format((self.account_number), (self.accnt_balance)))
+            self.logger.log("Account opened with new account number {0} and the balance is {1}".format((self.account_number), (self.accnt_balance)))
             self.account_open = True
             self.update_cust_data()
         else:
@@ -117,31 +128,42 @@ class Account:
     def deposit_money(self):
         self.screen_clear()
         money = int(input("Please enter the amount you would like to deposit:"))
-        self.accnt_balance += money
-        self.translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
-        self.logger.log("Deposited an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
-        print("successfully deposited your money")
+        self.logger.log("user requested {} amount for deposit".format(money))
+        with open(self.file_location, 'r+') as file:
+            for cust_record in file:
+                cust_record = ast.literal_eval(cust_record)
+                self.accnt_balance = cust_record["balance_avail"]
+                self.accnt_balance += money
+                self.translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+                self.logger.log("Deposited an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
+                print("successfully deposited your money")
 
     def withdraw_money(self):
         self.screen_clear()
         money = int(input("Please enter the amount you would like to withdraw from account:"))
-        if self.accnt_balance >= money:
-            self.accnt_balance -= money
-            self.translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
-            self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
-            print("successfully money withdrawn")
-        else:
-            if self.accnt_balance <= 0:
-                print("Your Account is already overdrafted or the Balance is '0', Please contact the Bank")
-            else:
-                if self.overdraft_plan:
-                    print("You will be charged $12 overdraft penality")
-                    self.accnt_balance -= 12
-                    self.withdraw_money(money)
+        self.logger.log("user requested {} amount for withdrawl".format(money))
+
+        with open(self.file_location, 'r+') as file:
+            for cust_record in file:
+                cust_record = ast.literal_eval(cust_record)
+                self.accnt_balance = cust_record["balance_avail"]
+                if self.accnt_balance >= money:
+                    self.accnt_balance -= money
+                    self.translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
+                    self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
+                    print("successfully money withdrawn")
                 else:
-                    print("You will be charged overdraft penality")
-                    self.accnt_balance -= 50
-                    self.withdraw_money(money)
+                    if self.accnt_balance <= 0:
+                        print("Your Account is already overdrafted or the Balance is '0', Please contact the Bank")
+                    else:
+                        if self.overdraft_plan:
+                            print("You will be charged $12 overdraft penality")
+                            self.accnt_balance -= 12
+                            self.withdraw_money(money)
+                        else:
+                            print("You will be charged overdraft penality")
+                            self.accnt_balance -= 50
+                            self.withdraw_money(money)
 
     def view_balance(self):
         self.screen_clear()
@@ -154,6 +176,7 @@ class Account:
 
     def loan_check(self):
         self.screen_clear()
+        self.view_balance()
         if self.accnt_balance >= 500:
             print("We considered your Loan application and it will be processed")
         else:
@@ -198,8 +221,11 @@ class Account:
             for cust_record in file:
                 cust_record = ast.literal_eval(cust_record)
                 self.customer_data = cust_record
+                self.screen_clear()
+                print("*********Your Account details*********")
                 for (key,value) in self.customer_data.items():
-                    print(("{0}\t:{1}".format((key), (value))) + "\n" )
+                    print(("\n" "{0}\t:{1}".format((key), (value))) + "\n" )
+                self.logger.log("customer details verified.")
 
     def update_cust_data(self):
         self.customer_data["balance_avail"] = self.accnt_balance 
