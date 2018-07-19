@@ -15,9 +15,10 @@ Banking Project
 
 
 class Account:
-    def __init__(self):
+    def __init__(self,logger):
         print("Welcome to BOFA")
         self.accnt_balance = 0
+        self.logger = logger
         self.translist = []
         self.customer_data = {}
         self.date = datetime.date.today()
@@ -40,6 +41,10 @@ class Account:
         elif choice == "2":
             account_number = input("Please enter your account number:")
             self.validate_user_and_process_request(account_number)
+            if self.is_valid_user:
+                self.customer_options()
+            else:
+                print("Please provide valid account number")
 
     def customer_options(self):
         while True:
@@ -89,15 +94,23 @@ class Account:
                     self.logger.log("is the  valid user: {}".format(self.is_valid_user)) 
                     break 
     def change_profile(self):
-        print("At this moment, you can only update your contact details")
-        customer_new_contact = int(input("Please enter the new contact:"))
-        with open(self.file_location, 'r') as file:
-            for cust_record in file:
-                cust_record = ast.literal_eval(cust_record)
-                cust_record["contact_number"] = customer_new_contact
-                self.customer_data = cust_record
-                self.logger.log("New customer details {} has been updated.".format(customer_new_contact))
-                self.cust_data_write_to_file()
+        try:
+            print("At this moment, you can only update your contact details")
+            customer_new_contact = int(input("Please enter the new contact:"))
+            with open(self.file_location, 'r') as file:
+                for cust_record in file:
+                    cust_record = ast.literal_eval(cust_record)
+                    cust_record["contact_number"] = customer_new_contact
+                    self.customer_data = cust_record
+                    self.logger.log("New customer details {} has been updated.".format(customer_new_contact))
+                    self.cust_data_write_to_file()
+
+        except Exception as error:
+            self.logger.log(str(error))
+            print("We are sorry for inconvience, something went wrong please try again.")
+
+  
+
 
     def open_account(self):
         self.screen_clear()
@@ -233,22 +246,14 @@ class Account:
                 cust_record = ast.literal_eval(cust_record)
 
     def main(self):
-        if self.is_valid_user:
-            self.customer_options()
-        else:
-            print("Please provide valid account number")
+        self.show_menu_and_process_request()
 
 
 
 if __name__=="__main__":
-    krishnas_acnt = Account()
-    krishnas_acnt.main()
-    filename = None
     path = "/Users/hima/python/Bank-Project/banking/logs/"
-    set_filename()
+    timestamp = datetime.datetime.now()
+    filename = "session{}".format(timestamp.isoformat().rstrip("."))
     logger = Logger(path, filename)
-    show_menu_and_process_request()
-
-    def set_filename():
-        timestamp = datetime.datetime.now()
-        filename = "session{}".format(timestamp.isoformat())
+    krishnas_acnt = Account(logger)
+    krishnas_acnt.main()
