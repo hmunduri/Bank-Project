@@ -21,13 +21,12 @@ class Account:
         self.logger = logger
         self.translist = []
         self.customer_data = {}
-        self.date = datetime.datetime.strptime(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")
+        self.date = datetime.date.today()
         self.option_six = ["6",  "q", "quit"]
         self.overdraft_yes = ["y",  "yes"]
         self.account_open = False
         self.overdraft_plan = False
         self.file_location = "/Users/hima/Python/Bank-Project/banking/files/customer_data.txt"
-        self.trans_file_location = "/Users/hima/Python/Bank-Project/banking/files/transaction_list.txt"
         self.is_valid_user = False
 
     def show_menu_and_process_request(self):
@@ -47,12 +46,14 @@ class Account:
                     self.customer_options()
                 else:
                     print("Please provide valid account number")
-            elif choice.lower() in self.option_six:
-                sys.exit(0)
+#            elif choice == "q":
+ #               break
+            #elif choice.lower() in self.option_six:
+             #   break
             else:
                 print("Please select options 1 or 2")
                 self.show_menu_and_process_request()
-        except (KeyboardInterrupt):
+        except (KeyboardInterrupt, SystemExit):
             print("\n*****You have interupted or pressed ^C*****")
 
     def customer_options(self):
@@ -113,11 +114,11 @@ class Account:
                     self.customer_data = cust_record
                     self.logger.log("New customer details {} has been updated.".format(customer_new_contact))
                     self.cust_data_write_to_file()
-        except (KeyboardInterrupt):
-            print("\n*****You have interupted or pressed ^C*****")
         except Exception as error:
             self.logger.log(str(error))
             print("We are sorry for inconvience, something went wrong please try again.")
+        except (KeyboardInterrupt):
+            print("\n*****You have interupted or pressed ^C*****")
 
     def open_account(self):
         try:
@@ -152,8 +153,7 @@ class Account:
                     cust_record = ast.literal_eval(cust_record)
                     self.accnt_balance = cust_record["balance_avail"]
                     self.accnt_balance += money
-                    with open(self.trans_file_location, 'a') as file:
-                        file.write("Deposit trasaction of {0}: {1}".format((money), (self.accnt_balance)) + "\n" )
+                    self.translist.append("{0}\tDeposit trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
                     self.logger.log("Deposited an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
                     print("successfully deposited your money")
         except Exception as error:
@@ -173,8 +173,7 @@ class Account:
                     self.accnt_balance = cust_record["balance_avail"]
                     if self.accnt_balance >= money:
                         self.accnt_balance -= money
-                        with open(self.trans_file_location, 'a') as file:
-                            file.write("withdrawl trasaction of {0}: {1}".format((money), (self.accnt_balance)) + "\n" )
+                        self.translist.append("{0}\tWithdraw trasaction\t\t: {1}".format((self.date), (self.accnt_balance)))
                         self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
                         print("successfully money withdrawn")
                     else:
@@ -225,12 +224,8 @@ class Account:
         self.screen_clear()
         print("Date\t\tTrasaction Type\t\t\t Balance Available")
         print("==================================================================")
-        with open(self.trans_file_location, 'r') as file1:  
-            trans_contents = file1.readlines()
-            for line in trans_contents:
-                print(line)
-        #for list in self.translist:
-        #    print(list)
+        for list in self.translist:
+            print(list)
 
     def last_transaction(self):
         self.screen_clear()
@@ -261,7 +256,7 @@ class Account:
                 print("*********Your Account details*********")
                 for (key,value) in self.customer_data.items():
                     print(("\n" "{0}\t:{1}".format((key), (value))) + "\n" )
-                self.logger.log("customer verified verified.")
+                self.logger.log("customer details verified.")
 
     def update_cust_data(self):
         self.customer_data["balance_avail"] = self.accnt_balance 
@@ -283,7 +278,7 @@ class Account:
 
 if __name__=="__main__":
     path = "/Users/hima/python/Bank-Project/banking/logs/"
-    timestamp = datetime.datetime.strptime(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),"%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.datetime.now()
     filename = "session{}".format(timestamp.isoformat().rstrip("."))
     logger = Logger(path, filename)
     krishnas_acnt = Account(logger)
