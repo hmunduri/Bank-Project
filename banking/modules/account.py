@@ -171,6 +171,7 @@ class Account:
                 for cust_record in file:
                     cust_record = ast.literal_eval(cust_record)
                     self.accnt_balance = cust_record["balance_avail"]
+                    self.overdraft_plan = cust_record["overdraft_plan"]
                     if self.accnt_balance >= money:
                         self.accnt_balance -= money
                         with open(self.trans_file_location, 'a') as file:
@@ -183,17 +184,40 @@ class Account:
                         else:
                             if self.overdraft_plan:
                                 print("You will be charged $12 overdraft penality")
-                                self.accnt_balance -= 12
-                                self.withdraw_money(money)
+                                overdraft_charges = 12 
+                                self.accnt_balance -= money
+                                with open(self.trans_file_location, 'a') as file:
+                                    file.write("withdrawl trasaction of {0}: {1}".format((money), (self.accnt_balance)) + "\n" )
+                                self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
+                                self.accnt_balance -= overdraft_charges
+                                with open(self.trans_file_location, 'a') as file:
+                                    file.write("overdraft charges of {0}: {1}".format((overdraft_charges), (self.accnt_balance)) + "\n" )
+                                self.logger.log("Over draft penality of {0} and your latest available balance is {1}".format((50), (self.accnt_balance)))
+                                print("successfully money withdrawn")    
                             else:
-                                print("You will be charged overdraft penality")
-                                self.accnt_balance -= 50
-                                self.withdraw_money(money)
+                                print("You will be charged $50 overdraft penality")
+                                overdraft_charges = 50
+                                self.accnt_balance -= money
+                                with open(self.trans_file_location, 'a') as file:
+                                    file.write("withdrawl trasaction of {0}: {1}".format((money), (self.accnt_balance)) + "\n" )
+                                self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
+                                self.accnt_balance -= overdraft_charges
+                                with open(self.trans_file_location, 'a') as file:
+                                    file.write("overdraft charges of {0}: {1}".format((overdraft_charges), (self.accnt_balance)) + "\n" )
+                                self.logger.log("Over draft penality of {0} and your latest available balance is {1}".format((50), (self.accnt_balance)))
+                                print("successfully money withdrawn")
         except Exception as error:
             self.logger.log(str(error))
             print("Please provide the amount in $ Dollars")
         except (KeyboardInterrupt, SystemExit):
             print("\n*****You have interupted or pressed ^C*****") 
+    
+    #def withdraw_trasaction(self):
+    #    self.accnt_balance -= money
+    #    with open(self.trans_file_location, 'a') as file:
+    #        file.write("withdrawl trasaction of {0}: {1}".format((money), (self.accnt_balance)) + "\n" )
+    #    self.logger.log("withdrawl an amount of {0} and your latest available balance is {1}".format((money), (self.accnt_balance)))
+    #    print("successfully money withdrawn")  
 
     def view_balance(self):
         self.screen_clear()
@@ -229,15 +253,15 @@ class Account:
             trans_contents = file1.readlines()
             for line in trans_contents:
                 print(line)
-        #for list in self.translist:
-        #    print(list)
 
     def last_transaction(self):
         self.screen_clear()
         print("**** Your Last Recent Trascation *** ")
         print("Date\t\tTrasaction Type\t\t\t Balance Available")
         print("==================================================================")
-        print(self.translist[-1])
+        with open(self.trans_file_location, 'r') as file1:
+            trans_contents = file1.readlines()[-1]
+            print(trans_contents)
 
     def screen_clear(self):
         os.system('clear')
